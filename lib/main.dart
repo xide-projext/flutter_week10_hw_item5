@@ -1,3 +1,4 @@
+import 'dart:convert'; // JSON 인코딩 및 디코딩을 위한 라이브러리
 import 'package:flutter/material.dart';
 
 void main() {
@@ -111,5 +112,41 @@ class _MyHomePageState extends State<MyHomePage> {
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+}
+
+class MyData {
+  String name;
+  int age;
+
+  MyData({required this.name, required this.age});
+
+  String toJson() => json.encode({'name': name, 'age': age}); // JSON 형태로 인코딩
+
+  factory MyData.fromJson(String str) {
+    final jsonData = json.decode(str); // JSON 디코딩
+    return MyData(
+        name: jsonData['name'], age: jsonData['age']); // MyData 인스턴스 생성
+  }
+
+  static Future<MyData?> readInstance() async {
+    final prefs =
+        await SharedPreferences.getInstance(); // SharedPreferences 인스턴스 생성
+    final jsonString =
+        prefs.getString('myData'); // SharedPreferences에서 key가 'myData'인 값을 불러옴
+
+    if (jsonString == null) {
+      // 저장된 값이 없으면 null 반환
+      return null;
+    }
+
+    return MyData.fromJson(jsonString); //
+  }
+
+  Future<void> saveInstance() async {
+    final prefs =
+        await SharedPreferences.getInstance(); // SharedPreferences 인스턴스 생성
+    prefs.setString(
+        'myData', toJson()); // key가 'myData'인 값에 MyData 인스턴스를 JSON으로 인코딩하여 저장
   }
 }
